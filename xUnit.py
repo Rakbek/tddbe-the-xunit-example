@@ -8,8 +8,8 @@ class TestCase:
     def run(self):
         result = TestResult()
         result.testStarted()
-        self.setUp()
         try:
+            self.setUp()
             method = getattr(self, self.name)
             method()
         except:
@@ -30,6 +30,12 @@ class WasRun(TestCase):
         self.log= "setUp "
     def tearDown(self):
         self.log= self.log + "tearDown "
+
+class BrokenSetUp(TestCase):
+    def testMethod(self):
+        pass
+    def setUp(self):
+        raise Exception
 
 class TestResult:
     def __init__(self):
@@ -60,8 +66,14 @@ class TestCaseTest(TestCase):
         test= WasRun("testBrokenMethod")
         result= test.run()
         assert("1 run, 1 failed" == result.summary())
+    def testFailedSetUp(self):
+        test= BrokenSetUp("testMethod");
+        result= test.run()
+        assert("1 run, 1 failed" == result.summary())
 
-TestCaseTest("testTemplateMethod").run()
-TestCaseTest("testResult").run()
-TestCaseTest("testFailedREsultFormatting").run()
-TestCaseTest("testFailedResult").run()
+
+print(TestCaseTest("testTemplateMethod").run().summary())
+print(TestCaseTest("testResult").run().summary())
+print(TestCaseTest("testFailedREsultFormatting").run().summary())
+print(TestCaseTest("testFailedResult").run().summary())
+print(TestCaseTest("testFailedSetUp").run().summary())
